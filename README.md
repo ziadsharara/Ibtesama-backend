@@ -1,86 +1,89 @@
 # 🦷 Ibtesama - Dental Clinic Management System
 
-**Ibtesama** is a comprehensive dental clinic management ecosystem built to streamline clinic operations, enhance patient experience, and empower clinic staff with powerful tools and real-time data access.
-
-This full-stack project includes:
-- A **React Admin Dashboard** for internal clinic management.
-- A **Next.js Website** for patient-facing services like online appointment booking.
-- A **React Native Mobile App** for doctors to manage appointments on the go.
-- A **Node.js Backend** that powers the entire system via RESTful APIs.
+**Ibtesama** is a full-stack dental clinic management system. This repository contains the **Back-End** services built using **Node.js** and **Express**, providing a robust and scalable RESTful API for managing all aspects of a dental clinic's operations.
 
 ---
 
-## 🛠️ Tech Stack
+## ⚙️ Backend Overview
 
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB (Mongoose ORM)
-- **Authentication**: JWT-based auth system with role-based access control
-- **Frontend**: 
-  - React (Admin Dashboard)
-  - Next.js (Public Website)
-  - React Native (Doctor Mobile App)
+This API powers three separate frontends:
+- **Admin Dashboard** (React)
+- **Patient Website** (Next.js)
+- **Doctor Mobile App** (React Native)
 
----
+### 🔐 Authentication & Authorization
 
-## 📁 Project Phases
-
-### 📌 Phase 01: Admin Dashboard (React)
-Internal system for admins, doctors, and receptionists to manage:
-- Patients and appointments
-- Medical records and treatment plans
-- Lab orders and inventory
-- Finances and payments
-
-#### 👥 Roles & Permissions
-- **Admin**: Full access. Can manage users, appointments, finances, etc.
-- **Doctor**: Manage own appointments and patients. Access lab files and inventory orders.
-- **Receptionist**: Handle contact info, appointments, lab and inventory orders.
-
-#### 🔄 Core Features
-- Auth (Login, Role-based access)
-- Appointments (CRUD + status)
-- Patients (Profiles, dental charts, history, X-rays)
-- Labs (Orders, statuses, payments)
-- Inventory (Supplies, suppliers, stock management)
-- Finances (Payments tracking, summaries)
+- JWT-based authentication
+- Role-based access control (`admin`, `doctor`, `receptionist`)
 
 ---
 
-### 🌐 Phase 02: Public Website (Next.js)
-- Real-time appointment scheduling with doctors
-- Information about services, doctors, and clinic location
-- Contact form and inquiry management
+## 🗂️ API Modules & Responsibilities
+
+### 🧑‍⚕️ Users & Roles
+- Create and manage users (Admin, Doctor, Receptionist)
+- Role assignment and access control
+- Protected routes based on role
+
+### 📅 Appointments
+- CRUD operations for appointment scheduling
+- Status tracking (e.g., pending, confirmed, completed)
+- Filtering by date, doctor, patient
+
+### 👥 Patients
+- Full patient profiles
+- Dental charts and X-rays
+- Medical history and visit records
+
+### 🧪 Labs
+- Lab order creation and tracking
+- Payment status for lab services
+
+### 📦 Inventory
+- Manage supplies and suppliers
+- Stock tracking and order requests
+
+### 💰 Finances
+- Handle patient payments
+- Clinic revenue summaries and reports
 
 ---
 
-### 📱 Phase 03: Mobile App (React Native)
-- A lightweight app for doctors to manage appointments, view patient data, and track treatments from their phones.
+## 🧱 Tech Stack
+
+- **Node.js** with **Express.js**
+- **MongoDB** with **Mongoose**
+- **JWT** for authentication
+- **Multer** for file uploads (X-rays, images)
+- **Express Validator** for request validation
+- **RESTful API** structure
 
 ---
 
-### 🧠 Phase 04: Future Enhancements
-- AI-powered X-ray analysis
-- Patient portal to access medical history and payments
-- Automated reminders (SMS, WhatsApp, Email)
+## 📐 Schema Design
+
+- Carefully structured MongoDB collections to separate responsibilities:
+  - `users`, `patients`, `appointments`, `labs`, `inventoryItems`, `suppliers`, `payments`
+- Relationships managed via object references
+- Scalable and modular folder architecture
 
 ---
 
-## 🧩 Data Structure & APIs
+## 🧪 API Sample Endpoints
 
-The system is designed with modular REST APIs including:
+```http
+POST   /api/auth/login
+GET    /api/users/me
+POST   /api/appointments
+PATCH  /api/appointments/:id/status
+POST   /api/patients
+GET    /api/inventory/supplies
+POST   /api/labs/orders
+```
 
-- `/auth/login`
-- `/api/users/me`
-- `/api/appointments`
-- `/api/patients`
-- `/api/labs` and `/api/labs/orders`
-- `/api/inventory/supplies`, `/suppliers`, `/orders`
-- `/api/finances/*`
+All endpoints are secured using JWT authentication and role-based access filters.
 
-All API responses follow consistent data models and are authenticated via bearer tokens.
+📌 Project Status
+🚧 Backend development is currently in progress — schema design, models, and core routes are under implementation.
 
----
 
-## 📌 Status
-
-> 🚧 Phase 01 (Backend + Admin Dashboard) is in active development.
