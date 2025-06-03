@@ -6,32 +6,29 @@ const userSchema = new mongoose.Schema(
     name: {
       firstName: {
         type: String,
-        required: [true, 'Name Required!'],
+        required: [true, 'First Name Required!'],
         minlength: [3, 'Too short name!'],
         maxlength: [20, 'Too long '],
       },
       lastName: {
         type: String,
-        required: [true, 'Name Required!'],
+        required: [true, 'Last Name Required!'],
         minlength: [3, 'Too short name!'],
         maxlength: [20, 'Too long '],
       },
     },
-
     email: String,
     phone: {
       number: String,
       calls: Boolean,
       whatsapp: Boolean,
     },
-
     address: {
       address: String,
       city: String,
       government: String,
       country: String,
     },
-
     role: {
       type: String,
       enum: ['admin', 'doctor', 'receptionist'],
@@ -50,12 +47,7 @@ export const User = mongoose.model('User', userSchema);
 
 // Create doctor schema
 const doctorSchema = new mongoose.Schema({
-  specialties: [
-    {
-      specialty: String,
-      isOfSpecialty: Boolean,
-    },
-  ],
+  specialties: [String],
   patients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' }],
   labOrders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'LabOrder' }],
 });
