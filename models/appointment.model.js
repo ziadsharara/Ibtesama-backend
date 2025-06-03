@@ -87,5 +87,6 @@ appointmentSchema.virtual('duration').get(function () {
   const start = startHour * 60 + startMinute;
   const end = endHour * 60 + endMinute;
 
-  return `${end - start} minutes`;
+  const duration = end - start;
+  return duration >= 0 ? duration : null;
 });
