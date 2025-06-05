@@ -2,7 +2,7 @@
 
 **Ibtesama** is a backend API for a dental clinic management system designed to streamline operations like appointments, patient records, lab orders, inventory, and finances. Built with **Node.js**, **Express**, and **MongoDB**, the system supports role-based access for Admins, Doctors, and Receptionists.
 
-⚙ **Check out the backend repo by [@abdelrahmanHSalama](https://github.com/abdelrahmanHSalama/ibtesama-dashboard)**.
+⚙ **Check out the frontend repo by [@abdelrahmanHSalama](https://github.com/abdelrahmanHSalama/ibtesama-dashboard)**.
 
 ---
 
