@@ -1,5 +1,6 @@
 import slugify from 'slugify';
 import Appointment from '../models/appointmentModel.js';
+import { ApiError } from '../utilities/apiErrors.js';
 
 // @desc    Get list of appointments
 // @route   GET /api/appointments
@@ -57,12 +58,9 @@ export const getAppointment = async (req, res) => {
   const appointment = await Appointment.findById(id);
 
   if (!appointment) {
-    return res.status(404).json({
-      success: false,
-      message: `There is no user with this id: ${id}`,
-    });
+    // ApiError('message', statusCode)
+    return next(new ApiError(`No appointment for this id ${id}`, 404));
   }
-
   res.status(200).json({ success: true, data: appointment });
 };
 
@@ -104,10 +102,7 @@ export const updateAppointment = async (req, res) => {
   );
 
   if (!appointment) {
-    return res.status(404).json({
-      success: false,
-      message: `There is no user with this id: ${id}`,
-    });
+    return next(new ApiError(`No appointment for this id ${id}`, 404));
   }
   res.status(200).json({ success: true, data: appointment });
 };
@@ -119,10 +114,7 @@ export const deleteAppointment = async (req, res) => {
   const appointment = await Appointment.findByIdAndDelete(id);
 
   if (!appointment) {
-    return res.status(404).json({
-      success: false,
-      message: `There is no user with this id: ${id}`,
-    });
+    return next(new ApiError(`No appointment for this id ${id}`, 404));
   }
   res
     .status(200)
