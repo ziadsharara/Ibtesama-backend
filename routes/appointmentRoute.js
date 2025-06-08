@@ -5,6 +5,7 @@ import {
   getAppointment,
   updateAppointment,
   deleteAppointment,
+  isAvailable,
 } from '../services/appointmentsService.js';
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router
   .get(getAppointment)
   .patch(updateAppointment)
   .delete(deleteAppointment);
+router.route('/is-available').post(isAvailable);
 
 export default router;
