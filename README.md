@@ -1,89 +1,46 @@
-# 🦷 Ibtesama - Dental Clinic Management System
+# Ibtesama – Dental Clinic Management System 🦷
 
-**Ibtesama** is a full-stack dental clinic management system. This repository contains the **Back-End** services built using **Node.js** and **Express**, providing a robust and scalable RESTful API for managing all aspects of a dental clinic's operations.
+**Ibtesama** is a backend API for a dental clinic management system designed to streamline operations like appointments, patient records, lab orders, inventory, and finances. Built with **Node.js**, **Express**, and **MongoDB**, the system supports role-based access for Admins, Doctors, and Receptionists.
 
----
-
-## ⚙️ Backend Overview
-
-This API powers three separate frontends:
-- **Admin Dashboard** (React)
-- **Patient Website** (Next.js)
-- **Doctor Mobile App** (React Native)
-
-### 🔐 Authentication & Authorization
-
-- JWT-based authentication
-- Role-based access control (`admin`, `doctor`, `receptionist`)
+⚙ **Check out the frontend repo by [@abdelrahmanHSalama](https://github.com/abdelrahmanHSalama/ibtesama-dashboard)**.
 
 ---
 
-## 🗂️ API Modules & Responsibilities
 
-### 🧑‍⚕️ Users & Roles
-- Create and manage users (Admin, Doctor, Receptionist)
-- Role assignment and access control
-- Protected routes based on role
+## 🚀 Tech Stack
 
-### 📅 Appointments
-- CRUD operations for appointment scheduling
-- Status tracking (e.g., pending, confirmed, completed)
-- Filtering by date, doctor, patient
-
-### 👥 Patients
-- Full patient profiles
-- Dental charts and X-rays
-- Medical history and visit records
-
-### 🧪 Labs
-- Lab order creation and tracking
-- Payment status for lab services
-
-### 📦 Inventory
-- Manage supplies and suppliers
-- Stock tracking and order requests
-
-### 💰 Finances
-- Handle patient payments
-- Clinic revenue summaries and reports
+- **Node.js** + **Express.js** – RESTful API backend
+- **MongoDB** + **Mongoose** – NoSQL database & data modeling
+- **JWT Authentication** – Secure login with role-based access
+- **Multer** – File uploads (e.g. X-rays)
+- **Express Validator** – Input validation & sanitization
 
 ---
 
-## 🧱 Tech Stack
+## ✅ Features (Implemented)
 
-- **Node.js** with **Express.js**
-- **MongoDB** with **Mongoose**
-- **JWT** for authentication
-- **Multer** for file uploads (X-rays, images)
-- **Express Validator** for request validation
-- **RESTful API** structure
+- 🔐 **JWT Authentication** with role-based access (Admin, Doctor, Receptionist)
+- 📅 **Appointment Module** – Create & manage appointments, duration handling
+- 🧩 **Modular API Structure** with scalable route/controllers
+- ⚠️ **Error Handling** & input validation
 
 ---
 
-## 📐 Schema Design
+## 🔧 In Progress
 
-- Carefully structured MongoDB collections to separate responsibilities:
-  - `users`, `patients`, `appointments`, `labs`, `inventoryItems`, `suppliers`, `payments`
-- Relationships managed via object references
-- Scalable and modular folder architecture
+- 👤 **Patient Profiles** (personal data, medical history, visits)
+- 🧪 **Lab Orders** (test requests, results, payment tracking)
+- 📦 **Inventory Management** (supplies, stock levels, supplier orders)
+- 💰 **Billing Module** (payments, revenue tracking)
+- 📌 **Appointment Enhancements** (filtering, status updates)
 
 ---
 
-## 🧪 API Sample Endpoints
+## 🧠 Planned
 
-```http
-POST   /api/auth/login
-GET    /api/users/me
-POST   /api/appointments
-PATCH  /api/appointments/:id/status
-POST   /api/patients
-GET    /api/inventory/supplies
-POST   /api/labs/orders
-```
+- 📊 **Reporting & Analytics** (financial + operational metrics)
+- 🧪 **Full Lab Workflow** (order creation to lab results)
+- 🧾 **API Documentation** & test coverage
+- 🚀 **Production Deployment Setup** (Docker, CI/CD)
 
-All endpoints are secured using JWT authentication and role-based access filters.
-
-📌 Project Status
-🚧 Backend development is currently in progress — schema design, models, and core routes are under implementation.
-
-
+---
