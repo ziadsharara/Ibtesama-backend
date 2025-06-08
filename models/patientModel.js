@@ -82,6 +82,17 @@ const patientSchema = mongoose.Schema(
       },
     ],
   },
+  // Ensure virtuals and getters appear in JSON output
+  {
+    toJSON: {
+      virtuals: true,
+      getters: true,
+    },
+    toObject: {
+      virtuals: true,
+      getters: true,
+    },
+  },
   { timestamps: true }
 );
 
@@ -89,16 +100,6 @@ const patientSchema = mongoose.Schema(
 patientSchema.virtual('age').get(function () {
   if (!this.birthdate) return null;
   return moment().diff(this.birthdate, 'years');
-});
-
-// Ensure virtuals and getters appear in JSON output
-patientSchema.set('toJSON', {
-  virtuals: true,
-  getters: true,
-});
-patientSchema.set('toObject', {
-  virtuals: true,
-  getters: true,
 });
 
 const Patient = mongoose.model('Patient', patientSchema);
