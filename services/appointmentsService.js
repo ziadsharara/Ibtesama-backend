@@ -17,8 +17,10 @@ export const getAppointments = async (req, res) => {
 // @route   POST /api/appointment
 export const createAppointment = async (req, res) => {
   const {
-    patient,
-    doctor,
+    // Changed patient and doctor to patientName and doctorName for now.
+    patientName,
+    doctorName,
+    date,
     startTime,
     endTime,
     status,
@@ -33,11 +35,17 @@ export const createAppointment = async (req, res) => {
   // Auto calculate duration
   const [startHour, startMin] = startTime.split(':').map(Number);
   const [endHour, endMin] = endTime.split(':').map(Number);
-  const duration = endHour * 60 + endMin - (startHour * 60 + startMin);
+  // Changed this to support appointments crossing midnight.
+  const start = startHour * 60 + startMin;
+  const end = endHour * 60 + endMin;
+  const duration = end >= start ? end - start : 1440 - start + end;
 
-  const appointment = Appointment.create({
-    patient,
-    doctor,
+  // ChatGPT recommended using await here.
+  const appointment = await Appointment.create({
+    // Changed patient and doctor to patientName and doctorName for now.
+    patientName,
+    doctorName,
+    date,
     startTime,
     endTime,
     duration,
