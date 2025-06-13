@@ -57,8 +57,7 @@ export const getAppointments = async (req, res) => {
       data: sortedGroupedData,
     });
   } catch (err) {
-    console.error('Error fetching appointments:', err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.next(new ApiError(err.message, 404));
   }
 };
 
@@ -143,26 +142,6 @@ export const updateAppointment = async (req, res) => {
     notes,
   } = req.body;
 
-  // Doesn't work!
-  // const appointment = await Appointment.findOneAndUpdate(
-  //   { _id: id },
-  //   {
-  //     patient,
-  //     doctor,
-  //     startTime,
-  //     endTime,
-  //     status,
-  //     chiefComplaint,
-  //     diagnosis,
-  //     workToBeDone,
-  //     workDone,
-  //     prescribedMeds,
-  //     notes,
-  //   },
-  //   { new: true } // to return the data after update in response
-  // );
-
-  // Works!
   const appointment = await Appointment.findOneAndUpdate(
     { _id: id },
     { $set: req.body },

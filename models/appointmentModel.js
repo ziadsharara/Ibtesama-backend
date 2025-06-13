@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { ApiError } from '../utilities/apiErrors.js';
 
 // Create appointment schema
 const appointmentSchema = new mongoose.Schema(
@@ -7,7 +8,6 @@ const appointmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-    // Changed patient and doctor to patientName and doctorName for now.
     patientName: String,
     // patientId: {
     //   type: mongoose.Schema.Types.ObjectId,
@@ -22,19 +22,16 @@ const appointmentSchema = new mongoose.Schema(
     date: String,
     startTime: String,
     endTime: String,
-    // Added duration to schema.
     duration: {
       type: Number,
       required: false,
     },
     status: {
       type: String,
-      // Removed "inProgress".
       enum: ['Pending', 'Finished', 'Cancelled'],
       default: 'Pending',
       required: true,
     },
-    // Changed chiefComplaint and diagnosis to arrays.
     chiefComplaint: [String],
     diagnosis: [String],
     workToBeDone: [String],
@@ -109,10 +106,7 @@ appointmentSchema.post('findOneAndDelete', async function (doc) {
 
     await patient.save();
   } catch (err) {
-    console.error(
-      'Error syncing treatmentHistory after findOneAndDelete:',
-      err
-    );
+    throw new ApiError(err.message, 500);
   }
 });
 
