@@ -1,12 +1,13 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import morgan from 'morgan'; // HTTP request logger middleware
+import morgan from 'morgan';
+import cors from 'cors'; // 👈 Import cors
 import dbConnection from './config/database.js';
 import appointmentRoute from './routes/appointmentRoute.js';
 import { ApiError } from './utilities/apiErrors.js';
 import { globalError } from './middlewares/errorMiddleware.js';
 
-dotenv.config({ path: 'config.env' }); // Setting the .env variables
+dotenv.config({ path: 'config.env' });
 
 // Connect with db
 dbConnection();
@@ -17,6 +18,15 @@ const app = express();
 // Middlewares
 app.use(express.json());
 
+// 👇 Add CORS middleware BEFORE your routes
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // frontend origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    credentials: true, // if you're using cookies/auth headers
+  })
+);
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
   console.log(`mode: ${process.env.NODE_ENV}`);
@@ -25,7 +35,7 @@ if (process.env.NODE_ENV === 'development') {
 // Mount Routes
 app.use('/api/appointment', appointmentRoute);
 
-// Generate error handling middleware for express
+// Generate error for undefined routes
 app.use((req, res, next) => {
   next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
 });
@@ -38,10 +48,9 @@ const server = app.listen(PORT, () =>
   console.log(`Example app listening on port ${PORT}!`)
 );
 
-// Handling rejections outside express
+// Handling unhandled promise rejections
 process.on('unhandledRejection', err => {
   console.error(`UnhandledRejection Errors: ${err.name} | ${err.message}`);
-  // finish all processes on the server and exit from app
   server.close(() => {
     console.error(`Shutting down...`);
     process.exit(1);

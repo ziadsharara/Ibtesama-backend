@@ -7,36 +7,46 @@ const appointmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    // Changed patient and doctor to patientName and doctorName for now.
     patientName: String,
-    patientId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Patient',
-    },
+    // patientId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'Patient',
+    // },
     doctorName: String,
-    doctorId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Doctor',
-    },
-    date: Date,
+    // doctorId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'Doctor',
+    // },
+    // Added date to schema.
+    date: String,
     startTime: String,
     endTime: String,
+    // Added duration to schema.
+    duration: {
+      type: Number,
+      required: false,
+    },
     status: {
       type: String,
-      enum: ['pending', 'inProgress', 'finished', 'cancelled'],
-      default: 'pending',
+      // Removed "inProgress".
+      enum: ['Pending', 'Finished', 'Cancelled'],
+      default: 'Pending',
       required: true,
     },
-    chiefComplaint: String,
-    diagnosis: String,
+    // Changed chiefComplaint and diagnosis to arrays.
+    chiefComplaint: [String],
+    diagnosis: [String],
     workToBeDone: [String],
     workDone: [String],
     prescribedMeds: [String],
     notes: [
       {
         note: String,
+        // Removed these for now.
         // author: { id: String, role: String },
-        createdAt: Date,
-        updatedAt: Date,
+        // createdAt: Date,
+        // updatedAt: Date,
       },
     ],
   },
