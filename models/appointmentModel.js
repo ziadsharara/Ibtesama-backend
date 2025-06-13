@@ -23,7 +23,10 @@ const appointmentSchema = new mongoose.Schema(
     startTime: String,
     endTime: String,
     // Added duration to schema.
-    duration: Number,
+    duration: {
+      type: Number,
+      required: false,
+    },
     status: {
       type: String,
       // Removed "inProgress".

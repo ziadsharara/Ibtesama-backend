@@ -5,12 +5,61 @@ import { ApiError } from '../utilities/apiErrors.js';
 
 // @desc    Get list of appointments
 // @route   GET /api/appointments
+
+// export const getAppointments = async (req, res) => {
+//   const appointments = await Appointment.find({});
+//   res.status(200).json({
+//     success: true,
+//     data: appointments,
+//   });
+// };
+
 export const getAppointments = async (req, res) => {
-  const appointments = await Appointment.find({});
-  res.status(200).json({
-    success: true,
-    data: appointments,
-  });
+  try {
+    const appointments = await Appointment.find({});
+    const groupedData = {};
+
+    // Group by date
+    appointments.forEach(appt => {
+      const requiredData = {
+        _id: appt._id,
+        patient: appt.patientName,
+        doctor: appt.doctorName,
+        startTime: appt.startTime,
+        endTime: appt.endTime,
+        status: appt.status,
+        workToBeDone: appt.workToBeDone,
+      };
+
+      if (!groupedData[appt.date]) {
+        groupedData[appt.date] = [];
+      }
+
+      groupedData[appt.date].push(requiredData);
+    });
+
+    // Sort appointments inside each date group by startTime
+    for (const date in groupedData) {
+      groupedData[date].sort((a, b) =>
+        moment(a.startTime, 'HH:mm').diff(moment(b.startTime, 'HH:mm'))
+      );
+    }
+
+    // Sort dates ascending
+    const sortedGroupedData = Object.fromEntries(
+      Object.entries(groupedData).sort(([dateA], [dateB]) =>
+        moment(dateA, 'DD-MM-YYYY').diff(moment(dateB, 'DD-MM-YYYY'))
+      )
+    );
+
+    res.status(200).json({
+      success: true,
+      data: sortedGroupedData,
+    });
+  } catch (err) {
+    console.error('Error fetching appointments:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 };
 
 // @desc    Create appointment
@@ -32,13 +81,15 @@ export const createAppointment = async (req, res) => {
     notes,
   } = req.body;
 
-  // Auto calculate duration
-  const [startHour, startMin] = startTime.split(':').map(Number);
-  const [endHour, endMin] = endTime.split(':').map(Number);
-  // Changed this to support appointments crossing midnight.
-  const start = startHour * 60 + startMin;
-  const end = endHour * 60 + endMin;
-  const duration = end >= start ? end - start : 1440 - start + end;
+  // Updated to support appointments that continue across the midnight + fallback if there's no startTime and endTime.
+  let duration = null;
+  if (startTime && endTime) {
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    const start = startHour * 60 + startMin;
+    const end = endHour * 60 + endMin;
+    duration = end >= start ? end - start : 1440 - start + end;
+  }
 
   // ChatGPT recommended using await here.
   const appointment = await Appointment.create({
@@ -92,22 +143,30 @@ export const updateAppointment = async (req, res) => {
     notes,
   } = req.body;
 
+  // Doesn't work!
+  // const appointment = await Appointment.findOneAndUpdate(
+  //   { _id: id },
+  //   {
+  //     patient,
+  //     doctor,
+  //     startTime,
+  //     endTime,
+  //     status,
+  //     chiefComplaint,
+  //     diagnosis,
+  //     workToBeDone,
+  //     workDone,
+  //     prescribedMeds,
+  //     notes,
+  //   },
+  //   { new: true } // to return the data after update in response
+  // );
+
+  // Works!
   const appointment = await Appointment.findOneAndUpdate(
     { _id: id },
-    {
-      patient,
-      doctor,
-      startTime,
-      endTime,
-      status,
-      chiefComplaint,
-      diagnosis,
-      workToBeDone,
-      workDone,
-      prescribedMeds,
-      notes,
-    },
-    { new: true } // to return the data after update in response
+    { $set: req.body },
+    { new: true }
   );
 
   if (!appointment) {
