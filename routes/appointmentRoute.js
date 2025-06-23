@@ -7,19 +7,25 @@ import {
   deleteAppointment,
   isAvailable,
 } from '../services/appointmentsService.js';
-import calculateDuration from '../middlewares/calculateDuration.js';
+import * as authService from '../services/authService.js';
 
 const router = express.Router();
 
 router
   .route('/')
-  .get(getAppointments)
-  .post(calculateDuration, createAppointment);
+  .get(authService.protect, authService.allowedTo('admin'), getAppointments)
+  .post(authService.protect, authService.allowedTo('admin'), createAppointment);
 router
   .route('/:id')
-  .get(getAppointment)
-  .patch(updateAppointment)
-  .delete(deleteAppointment);
-router.route('/is-available').post(isAvailable);
+  .get(authService.protect, authService.allowedTo('admin'), getAppointment)
+  .patch(authService.protect, authService.allowedTo('admin'), updateAppointment)
+  .delete(
+    authService.protect,
+    authService.allowedTo('admin'),
+    deleteAppointment
+  );
+router
+  .route('/is-available')
+  .post(authService.protect, authService.allowedTo('admin'), isAvailable);
 
 export default router;

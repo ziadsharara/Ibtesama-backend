@@ -2,6 +2,7 @@ import { Model } from 'mongoose';
 import { ApiError } from '../utilities/apiErrors.js';
 import ApiFeatures from '../utilities/apiFeatures.js';
 import qs from 'qs';
+import moment from 'moment';
 
 export const deleteOne = Model => async (req, res, next) => {
   const { id } = req.params;
@@ -61,14 +62,18 @@ export const getOne = Model => async (req, res, next) => {
 export const getAll = Model => async (req, res, next) => {
   try {
     let filter = {};
+    const today = moment().format('DD-MM-YYYY');
+
     if (req.filterObj) {
       filter = req.filterObj;
     }
 
+    filter.date = today;
+
     const rawQuery = req._parsedUrl.query;
     const parsedQuery = qs.parse(rawQuery);
 
-    const documentsCount = await Model.countDocuments();
+    const documentsCount = await Model.countDocuments(filter);
     const apiFeatures = new ApiFeatures(Model.find(filter), parsedQuery)
       .paginate(documentsCount)
       .filter()

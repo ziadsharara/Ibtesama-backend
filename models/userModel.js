@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema(
   {
@@ -33,6 +34,7 @@ const userSchema = new mongoose.Schema(
       calls: Boolean,
       whatsapp: Boolean,
     },
+    profileImg: String,
     address: {
       address: String,
       city: String,
@@ -51,5 +53,12 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  // Hashing user password
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
 
 export const User = mongoose.model('User', userSchema);
