@@ -7,10 +7,14 @@ import {
   deleteAppointment,
   isAvailable,
 } from '../services/appointmentsService.js';
+import calculateDuration from '../middlewares/calculateDuration.js';
 
 const router = express.Router();
 
-router.route('/').get(getAppointments).post(createAppointment);
+router
+  .route('/')
+  .get(getAppointments)
+  .post(calculateDuration, createAppointment);
 router
   .route('/:id')
   .get(getAppointment)

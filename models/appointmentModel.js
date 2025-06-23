@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { ApiError } from '../utilities/apiErrors.js';
+import Patient from './patientModel.js';
 
 // Create appointment schema
 const appointmentSchema = new mongoose.Schema(
@@ -18,7 +19,6 @@ const appointmentSchema = new mongoose.Schema(
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: 'Doctor',
     // },
-    // Added date to schema.
     date: String,
     startTime: String,
     endTime: String,
@@ -40,10 +40,6 @@ const appointmentSchema = new mongoose.Schema(
     notes: [
       {
         note: String,
-        // Removed these for now.
-        // author: { id: String, role: String },
-        // createdAt: Date,
-        // updatedAt: Date,
       },
     ],
   },

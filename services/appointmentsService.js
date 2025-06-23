@@ -1,172 +1,33 @@
 import slugify from 'slugify';
 import moment from 'moment';
 import Appointment from '../models/appointmentModel.js';
-import { ApiError } from '../utilities/apiErrors.js';
+import {
+  createOne,
+  deleteOne,
+  getAll,
+  getOne,
+  updateOne,
+} from './handlersFactory.js';
 
 // @desc    Get list of appointments
 // @route   GET /api/appointments
-
-// export const getAppointments = async (req, res) => {
-//   const appointments = await Appointment.find({});
-//   res.status(200).json({
-//     success: true,
-//     data: appointments,
-//   });
-// };
-
-export const getAppointments = async (req, res) => {
-  try {
-    const appointments = await Appointment.find({});
-    const groupedData = {};
-
-    // Group by date
-    appointments.forEach(appt => {
-      const requiredData = {
-        _id: appt._id,
-        patient: appt.patientName,
-        doctor: appt.doctorName,
-        startTime: appt.startTime,
-        endTime: appt.endTime,
-        status: appt.status,
-        workToBeDone: appt.workToBeDone,
-      };
-
-      if (!groupedData[appt.date]) {
-        groupedData[appt.date] = [];
-      }
-
-      groupedData[appt.date].push(requiredData);
-    });
-
-    // Sort appointments inside each date group by startTime
-    for (const date in groupedData) {
-      groupedData[date].sort((a, b) =>
-        moment(a.startTime, 'HH:mm').diff(moment(b.startTime, 'HH:mm'))
-      );
-    }
-
-    // Sort dates ascending
-    const sortedGroupedData = Object.fromEntries(
-      Object.entries(groupedData).sort(([dateA], [dateB]) =>
-        moment(dateA, 'DD-MM-YYYY').diff(moment(dateB, 'DD-MM-YYYY'))
-      )
-    );
-
-    res.status(200).json({
-      success: true,
-      data: sortedGroupedData,
-    });
-  } catch (err) {
-    res.next(new ApiError(err.message, 404));
-  }
-};
+export const getAppointments = getAll(Appointment);
 
 // @desc    Create appointment
 // @route   POST /api/appointment
-export const createAppointment = async (req, res) => {
-  const {
-    // Changed patient and doctor to patientName and doctorName for now.
-    patientName,
-    doctorName,
-    date,
-    startTime,
-    endTime,
-    status,
-    chiefComplaint,
-    diagnosis,
-    workToBeDone,
-    workDone,
-    prescribedMeds,
-    notes,
-  } = req.body;
-
-  // Updated to support appointments that continue across the midnight + fallback if there's no startTime and endTime.
-  let duration = null;
-  if (startTime && endTime) {
-    const [startHour, startMin] = startTime.split(':').map(Number);
-    const [endHour, endMin] = endTime.split(':').map(Number);
-    const start = startHour * 60 + startMin;
-    const end = endHour * 60 + endMin;
-    duration = end >= start ? end - start : 1440 - start + end;
-  }
-
-  // ChatGPT recommended using await here.
-  const appointment = await Appointment.create({
-    // Changed patient and doctor to patientName and doctorName for now.
-    patientName,
-    doctorName,
-    date,
-    startTime,
-    endTime,
-    duration,
-    status,
-    chiefComplaint,
-    diagnosis,
-    workToBeDone,
-    workDone,
-    prescribedMeds,
-    notes,
-  });
-  res.status(201).json({ success: true, data: appointment });
-};
+export const createAppointment = createOne(Appointment);
 
 // @desc    Get specific appointment by id
 // @route   GET /api/appointment/:id
-export const getAppointment = async (req, res) => {
-  const { id } = req.params;
-  const appointment = await Appointment.findById(id);
-
-  if (!appointment) {
-    // ApiError('message', statusCode)
-    return next(new ApiError(`No appointment for this id ${id}`, 404));
-  }
-  res.status(200).json({ success: true, data: appointment });
-};
+export const getAppointment = getOne(Appointment);
 
 // @desc    Update appointment
 // @route   PATCH /api/appointment/:id
-export const updateAppointment = async (req, res) => {
-  const { id } = req.params;
-  const {
-    patient,
-    doctor,
-    date,
-    startTime,
-    endTime,
-    status,
-    chiefComplaint,
-    diagnosis,
-    workToBeDone,
-    workDone,
-    prescribedMeds,
-    notes,
-  } = req.body;
-
-  const appointment = await Appointment.findOneAndUpdate(
-    { _id: id },
-    { $set: req.body },
-    { new: true }
-  );
-
-  if (!appointment) {
-    return next(new ApiError(`No appointment for this id ${id}`, 404));
-  }
-  res.status(200).json({ success: true, data: appointment });
-};
+export const updateAppointment = updateOne(Appointment);
 
 // @desc    delete appointment
 // @route   DELETE /api/appointment/:id
-export const deleteAppointment = async (req, res) => {
-  const { id } = req.params;
-  const appointment = await Appointment.findByIdAndDelete(id);
-
-  if (!appointment) {
-    return next(new ApiError(`No appointment for this id ${id}`, 404));
-  }
-  res
-    .status(200)
-    .json({ success: true, message: 'Appointment deleted successfully!' });
-};
+export const deleteAppointment = deleteOne(Appointment);
 
 // @desc    Check if time slot is available
 // @route   POST /api/appointment/is-available

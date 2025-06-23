@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// Create user schema
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -18,6 +17,17 @@ const userSchema = new mongoose.Schema(
       },
     },
     email: String,
+
+    password: {
+      type: String,
+      required: [true, 'password required!'],
+      minlength: [6, 'Too short password'],
+    },
+    passwordChangedAt: Date,
+    passwordResetCode: String,
+    passwordResetExpires: Date,
+    passwordResetVerified: Boolean,
+
     phone: {
       number: String,
       calls: Boolean,
@@ -31,7 +41,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'doctor', 'receptionist'],
+      enum: ['admin', 'doctor', 'receptionist', 'patient'],
       required: true,
     },
     salary: {
@@ -42,29 +52,4 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create user model
 export const User = mongoose.model('User', userSchema);
-
-// Create doctor schema
-const doctorSchema = new mongoose.Schema({
-  specialties: [String],
-  patients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' }],
-  labOrders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'LabOrder' }],
-});
-
-// Create doctor model
-export const Doctor = User.discriminator('Doctor', doctorSchema);
-
-// Create receptionist schema
-const receptionistSchema = new mongoose.Schema({
-  labOrders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'LabOrder' }],
-  inventoryOrders: [
-    { type: mongoose.Schema.Types.ObjectId, ref: 'InventoryOrder' },
-  ],
-});
-
-// Create receptionist model
-export const Receptionist = User.discriminator(
-  'Receptionist',
-  receptionistSchema
-);
