@@ -22,26 +22,29 @@ const appointmentSchema = new mongoose.Schema(
     date: String,
     startTime: String,
     endTime: String,
-    duration: {
-      type: Number,
-      required: false,
-    },
+    startTimeUTC: { type: Date, default: null },
+    endTimeUTC: { type: Date, default: null },
+    // duration: {
+    //   type: Number,
+    //   required: false,
+    // },
     status: {
       type: String,
       enum: ['Pending', 'Finished', 'Cancelled'],
       default: 'Pending',
-      required: true,
+      // required: true,
     },
     chiefComplaint: [String],
     diagnosis: [String],
     workToBeDone: [String],
     workDone: [String],
     prescribedMeds: [String],
-    notes: [
-      {
-        note: String,
-      },
-    ],
+    notes: [String],
+    // notes: [
+    //   {
+    //     note: String,
+    //   },
+    // ],
   },
   { timestamps: true }
 );
