@@ -31,41 +31,106 @@ export const deleteAppointment = deleteOne(Appointment);
 
 // @desc    Check if time slot is available
 // @route   POST /api/appointment/is-available
+// export const isAvailable = async (req, res) => {
+//   try {
+//     const { startTime, endTime } = req.body;
+
+//     if (!startTime || !endTime) {
+//       return res
+//         .status(400)
+//         .json({ message: 'Start and end times are required.' });
+//     }
+
+//     const start = new Date(startTime);
+//     const end = new Date(endTime);
+
+//     if (isNaN(start) || isNaN(end)) {
+//       return res.status(400).json({ message: 'Invalid date format.' });
+//     }
+
+//     if (start >= end) {
+//       return res
+//         .status(400)
+//         .json({ message: 'Start time must be before end time.' });
+//     }
+
+//     const overlapping = await Appointment.findOne({
+//       $or: [
+//         {
+//           startTime: { $lt: end },
+//           endTime: { $gt: start },
+//         },
+//       ],
+//     });
+
+//     return res.json({ available: !overlapping });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Server error.' });
+//   }
+// };
 export const isAvailable = async (req, res) => {
   try {
-    const { startTime, endTime } = req.body;
+    const { date, startTime, endTime } = req.body;
 
-    if (!startTime || !endTime) {
+    if (!date || !startTime) {
       return res
         .status(400)
-        .json({ message: 'Start and end times are required.' });
+        .json({ error: 'Date and start time are required.' });
     }
 
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-
-    if (isNaN(start) || isNaN(end)) {
-      return res.status(400).json({ message: 'Invalid date format.' });
-    }
-
-    if (start >= end) {
-      return res
-        .status(400)
-        .json({ message: 'Start time must be before end time.' });
-    }
-
-    const overlapping = await Appointment.findOne({
-      $or: [
-        {
-          startTime: { $lt: end },
-          endTime: { $gt: start },
-        },
-      ],
+    const startTimeString = `${date}T${startTime}`;
+    const startTimeDate = DateTime.fromISO(startTimeString, {
+      zone: 'Africa/Cairo',
     });
+    if (!startTimeDate.isValid) {
+      return res.status(400).json({ error: 'Invalid start time.' });
+    }
+    const startTimeUTC = startTimeDate.startOf('minute').toUTC().toJSDate();
 
-    return res.json({ available: !overlapping });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error.' });
+    if (!endTime) {
+      const conflict = await Appointment.findOne({
+        startTimeUTC: { $lte: startTimeUTC },
+        endTimeUTC: { $gt: startTimeUTC },
+      });
+      if (!conflict) {
+        return res.status(200).json({
+          conflict: false,
+        });
+      }
+      return res.status(200).json({
+        conflict: true,
+        error: 'Start time falls within an existing appointment.',
+      });
+    }
+
+    const endTimeString = `${date}T${endTime}`;
+    let endTimeDate = DateTime.fromISO(endTimeString, {
+      zone: 'Africa/Cairo',
+    });
+    if (!endTimeDate.isValid) {
+      return res.status(400).json({ error: 'Invalid end time.' });
+    }
+    if (endTimeDate <= startTimeDate) {
+      endTimeDate = endTimeDate.plus({ days: 1 });
+    }
+    const endTimeUTC = endTimeDate.startOf('minute').toUTC().toJSDate();
+
+    const conflict = await Appointment.findOne({
+      startTimeUTC: { $lt: endTimeUTC },
+      endTimeUTC: { $gt: startTimeUTC },
+    });
+    if (!conflict) {
+      return res.status(200).json({
+        conflict: false,
+      });
+    }
+    return res.status(200).json({
+      conflict: true,
+      error: 'Time range overlaps with another appointment.',
+    });
+  } catch (err) {
+    console.error('checkConflict error:', err);
+    return res.status(500).json({ error: 'Server error.' });
   }
 };
