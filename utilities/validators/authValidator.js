@@ -53,5 +53,7 @@ export const loginValidator = [
     .isLength({ min: 6 })
     .withMessage('Password must be at 6 characters!'),
 
+  check('role').optional(),
+
   validatorMiddleware,
 ];
