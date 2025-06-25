@@ -14,6 +14,7 @@ export const signup = async (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
+    role: req.body.role,
   });
 
   // 2- Generate token
