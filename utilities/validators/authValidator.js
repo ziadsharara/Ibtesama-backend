@@ -37,6 +37,8 @@ export const signupValidator = [
 
   check('passwordConfirm').notEmpty().withMessage('Password confirm required!'),
 
+  check('role').optional(),
+
   validatorMiddleware,
 ];
 
@@ -52,8 +54,6 @@ export const loginValidator = [
     .withMessage('Password required!')
     .isLength({ min: 6 })
     .withMessage('Password must be at 6 characters!'),
-
-  check('role').optional(),
 
   validatorMiddleware,
 ];
