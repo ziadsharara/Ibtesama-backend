@@ -17,7 +17,7 @@ router
   .post(authService.protect, authService.allowedTo('admin'), createAppointment);
 router
   .route('/:id')
-  .get(authService.protect, authService.allowedTo('admin'), getAppointment)
+  // .get(authService.protect, authService.allowedTo('admin'), getAppointment)
   .patch(authService.protect, authService.allowedTo('admin'), updateAppointment)
   .delete(
     authService.protect,

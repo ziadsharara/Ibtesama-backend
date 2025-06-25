@@ -19,7 +19,7 @@ export const createAppointment = createOne(Appointment);
 
 // @desc    Get specific appointment by id
 // @route   GET /api/appointment/:id
-export const getAppointment = getOne(Appointment);
+// export const getAppointment = getOne(Appointment);
 
 // @desc    Update appointment
 // @route   PATCH /api/appointment/:id

@@ -49,26 +49,26 @@ export const createOne = Model => async (req, res) => {
   res.status(201).json({ success: true, data: document });
 };
 
-export const getOne = Model => async (req, res, next) => {
-  const { id } = req.params;
-  const document = await Model.findById(id);
-  if (!document) {
-    // ApiError('message', statusCode)
-    return next(new ApiError(`No document for this id ${id}`, 404));
-  }
-  res.status(200).json({ success: true, data: document });
-};
+// export const getOne = Model => async (req, res, next) => {
+//   const document = await Model.findOne({ user: req.user._id });
+//   if (!document) {
+//     // ApiError('message', statusCode)
+//     return next(new ApiError(`No document for this id ${id}`, 404));
+//   }
+//   res.status(200).json({ success: true, data: document });
+// };
 
 export const getAll = Model => async (req, res, next) => {
   try {
     let filter = {};
-    const today = moment().format('DD-MM-YYYY');
 
     if (req.filterObj) {
       filter = req.filterObj;
     }
 
-    filter.date = today;
+    if (req.user && req.user._id) {
+      filter.user = req.user._id;
+    }
 
     const rawQuery = req._parsedUrl.query;
     const parsedQuery = qs.parse(rawQuery);

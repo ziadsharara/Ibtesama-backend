@@ -8,11 +8,7 @@ export const signupValidator = [
     .notEmpty()
     .withMessage('User Required')
     .isLength({ min: 3 })
-    .withMessage('Too short user name')
-    .custom((val, { req }) => {
-      req.body.slug = slugify(val);
-      return true;
-    }),
+    .withMessage('Too short user name'),
 
   check('email')
     .notEmpty()
@@ -24,7 +20,7 @@ export const signupValidator = [
         if (user) {
           return Promise.reject(new Error('Email already in user!'));
         }
-      }),
+      })
     ),
 
   check('password')

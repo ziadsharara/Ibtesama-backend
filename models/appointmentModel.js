@@ -5,20 +5,12 @@ import Patient from './patientModel.js';
 // Create appointment schema
 const appointmentSchema = new mongoose.Schema(
   {
-    createdById: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
     patientName: String,
-    // patientId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'Patient',
-    // },
     doctorName: String,
-    // doctorId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'Doctor',
-    // },
     date: String,
     startTime: String,
     endTime: String,
