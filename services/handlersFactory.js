@@ -122,6 +122,8 @@ export const getAll = Model => async (req, res, next) => {
         endTime: appt.endTime,
         status: appt.status,
         workToBeDone: appt.workToBeDone,
+        prescribedMeds: appt.prescribedMeds,
+        notes: appt.notes,
         ...(req.user.role === 'admin' && {
           owner: {
             _id: appt.user._id,
