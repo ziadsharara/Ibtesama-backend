@@ -103,31 +103,15 @@ export const getOne = Model => async (req, res, next) => {
 // Get all documents with filters, search, pagination, and grouping (for Appointments)
 export const getAll = Model => async (req, res, next) => {
   try {
-    let filter = {};
+    // Determine the filter based on user role
+    const filter = req.user.role === 'admin' ? {} : { user: req.user._id };
 
-    if (req.filterObj) {
-      filter = req.filterObj;
-    }
+    // Fetch appointments, populate user info if admin
+    const appointments = await Model.find(filter).populate(
+      req.user.role === 'admin' ? 'user' : ''
+    );
 
-    if (req.user && req.user.role !== 'admin') {
-      filter.user = req.user._id;
-    }
-
-    const rawQuery = req._parsedUrl.query;
-    const parsedQuery = qs.parse(rawQuery);
-
-    const documentsCount = await Model.countDocuments(filter);
-
-    const apiFeatures = new ApiFeatures(Model.find(filter), parsedQuery)
-      .paginate(documentsCount)
-      .filter()
-      .search('Appointments')
-      .limitFields()
-      .sort();
-
-    const { mongooseQuery, paginationResult } = apiFeatures;
-    const appointments = await mongooseQuery;
-
+    // Group appointments by date
     const groupedData = {};
     appointments.forEach(appt => {
       const requiredData = {
@@ -138,6 +122,13 @@ export const getAll = Model => async (req, res, next) => {
         endTime: appt.endTime,
         status: appt.status,
         workToBeDone: appt.workToBeDone,
+        ...(req.user.role === 'admin' && {
+          owner: {
+            _id: appt.user._id,
+            name: appt.user.name,
+            email: appt.user.email,
+          },
+        }),
       };
 
       if (!groupedData[appt.date]) {
@@ -147,21 +138,23 @@ export const getAll = Model => async (req, res, next) => {
       groupedData[appt.date].push(requiredData);
     });
 
+    // Sort appointments by time within each date
     for (const date in groupedData) {
       groupedData[date].sort((a, b) =>
         moment(a.startTime, 'HH:mm').diff(moment(b.startTime, 'HH:mm'))
       );
     }
 
+    // Sort dates chronologically
     const sortedGroupedData = Object.fromEntries(
       Object.entries(groupedData).sort(([dateA], [dateB]) =>
         moment(dateA, 'DD-MM-YYYY').diff(moment(dateB, 'DD-MM-YYYY'))
       )
     );
 
+    // Send response
     res.status(200).json({
       success: true,
-      paginationResult,
       data: sortedGroupedData,
     });
   } catch (err) {
