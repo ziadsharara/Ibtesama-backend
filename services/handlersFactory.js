@@ -124,6 +124,7 @@ export const getAll = Model => async (req, res, next) => {
       data: sortedGroupedData,
     });
   } catch (err) {
+    console.error('Error details:', JSON.stringify(err, null, 2));
     return next(new ApiError(err.message, 500));
   }
 };
