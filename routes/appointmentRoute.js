@@ -7,7 +7,7 @@ import {
   deleteAppointment,
   isAvailable,
 } from '../services/appointmentsService.js';
-// import * as authService from '../services/authService.js';
+import * as authService from '../services/authService.js';
 
 const router = express.Router();
 

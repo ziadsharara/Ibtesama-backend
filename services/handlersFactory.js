@@ -4,6 +4,7 @@ import ApiFeatures from '../utilities/apiFeatures.js';
 import qs from 'qs';
 import moment from 'moment';
 
+// Delete one document by ID
 export const deleteOne = Model => async (req, res, next) => {
   const { id } = req.params;
   const document = await Model.findByIdAndDelete(id);
@@ -11,11 +12,14 @@ export const deleteOne = Model => async (req, res, next) => {
   if (!document) {
     return next(new ApiError(`No document for this id ${id}`, 404));
   }
-  res
-    .status(200)
-    .json({ success: true, message: 'Document deleted successfully!' });
+
+  res.status(200).json({
+    success: true,
+    message: 'Document deleted successfully!',
+  });
 };
 
+// Delete all documents from the collection
 export const deleteAll = Model => async (req, res, next) => {
   const result = await Model.deleteMany();
 
@@ -23,49 +27,62 @@ export const deleteAll = Model => async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: `All documents deleted successfully!`,
+    message: 'All documents deleted successfully!',
     deletedCount: result.deletedCount,
   });
 };
 
+// Update one document by ID
 export const updateOne = Model => async (req, res, next) => {
   const { id } = req.params;
-  const { name } = req.body;
-  // findOneAndUpdate(filter, update, options)
-  const document = await Model.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true } // to return the data after update in response
-  );
+
+  const document = await Model.findByIdAndUpdate(id, req.body, {
+    new: true, // Return updated document
+  });
 
   if (!document) {
-    return next(new ApiError(`No document for this id ${req.params.id}`, 404));
+    return next(new ApiError(`No document for this id ${id}`, 404));
   }
+
   res.status(200).json({ success: true, data: document });
 };
 
-export const createOne = Model => async (req, res) => {
+// Create a new document
+export const createOne = Model => async (req, res, next) => {
   const document = await Model.create(req.body);
   res.status(201).json({ success: true, data: document });
 };
 
-// export const getOne = Model => async (req, res, next) => {
-//   const document = await Model.findOne({ user: req.user._id });
-//   if (!document) {
-//     // ApiError('message', statusCode)
-//     return next(new ApiError(`No document for this id ${id}`, 404));
-//   }
-//   res.status(200).json({ success: true, data: document });
-// };
+// Get one document by ID, restrict to owner if not admin
+export const getOne = Model => async (req, res, next) => {
+  const { id } = req.params;
+  const filter = { _id: id };
 
+  // If not admin, restrict to user's own documents
+  if (req.user.role !== 'admin') {
+    filter.user = req.user._id;
+  }
+
+  const document = await Model.findOne(filter);
+
+  if (!document) {
+    return next(new ApiError(`No document found for this id: ${id}`, 404));
+  }
+
+  res.status(200).json({ success: true, data: document });
+};
+
+// Get all documents with filters, search, pagination, and grouping (for Appointments)
 export const getAll = Model => async (req, res, next) => {
   try {
     let filter = {};
 
+    // Custom filter (e.g., for nested routes)
     if (req.filterObj) {
       filter = req.filterObj;
     }
 
+    // If user is logged in, filter by user's documents
     if (req.user && req.user._id) {
       filter.user = req.user._id;
     }
@@ -74,6 +91,7 @@ export const getAll = Model => async (req, res, next) => {
     const parsedQuery = qs.parse(rawQuery);
 
     const documentsCount = await Model.countDocuments(filter);
+
     const apiFeatures = new ApiFeatures(Model.find(filter), parsedQuery)
       .paginate(documentsCount)
       .filter()
@@ -84,7 +102,7 @@ export const getAll = Model => async (req, res, next) => {
     const { mongooseQuery, paginationResult } = apiFeatures;
     const appointments = await mongooseQuery;
 
-    // Group by date
+    // Group appointments by date
     const groupedData = {};
     appointments.forEach(appt => {
       const requiredData = {
@@ -104,14 +122,14 @@ export const getAll = Model => async (req, res, next) => {
       groupedData[appt.date].push(requiredData);
     });
 
-    // Sort appointments inside each date group by startTime
+    // Sort appointments inside each date group by start time
     for (const date in groupedData) {
       groupedData[date].sort((a, b) =>
         moment(a.startTime, 'HH:mm').diff(moment(b.startTime, 'HH:mm'))
       );
     }
 
-    // Sort dates ascending
+    // Sort all date groups ascending
     const sortedGroupedData = Object.fromEntries(
       Object.entries(groupedData).sort(([dateA], [dateB]) =>
         moment(dateA, 'DD-MM-YYYY').diff(moment(dateB, 'DD-MM-YYYY'))
