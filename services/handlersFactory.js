@@ -31,7 +31,6 @@ export const deleteAll = Model => async (req, res, next) => {
 export const updateOne = Model => async (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
-  // findOneAndUpdate(filter, update, options)
   const document = await Model.findByIdAndUpdate(
     req.params.id,
     req.body,
